@@ -33,35 +33,36 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [refreshData]);
 
-  // Stats data with blockchain integration
+  // Mock data
   const stats = [
     {
-      title: 'Wallet Balance',
-      value: isConnected ? `${parseFloat(balance).toFixed(3)} ETH` : 'Not Connected',
-      subtitle: 'Available funds',
-      icon: 'wallet.pass.fill',
-      iconColor: theme.colors.success,
+      title: 'Total PRs',
+      value: '47',
+      subtitle: 'This month',
+      icon: 'arrow.triangle.pull',
+      trend: { value: 12, isPositive: true },
     },
     {
-      title: 'Reputation',
-      value: isConnected ? reputationScore.toString() : '0',
-      subtitle: 'Developer score',
+      title: 'Repositories',
+      value: '23',
+      subtitle: 'Contributing to',
+      icon: 'folder.fill',
+      iconColor: theme.colors.accent,
+    },
+    {
+      title: 'Stars Earned',
+      value: '1.2K',
+      subtitle: 'Total stars',
       icon: 'star.fill',
       iconColor: theme.colors.warning,
+      trend: { value: 8, isPositive: true },
     },
     {
-      title: 'Created Bounties',
-      value: userBounties.length.toString(),
-      subtitle: 'Total issued',
-      icon: 'plus.circle.fill',
-      iconColor: theme.colors.tint,
-    },
-    {
-      title: 'Assigned Bounties',
-      value: assignedBounties.length.toString(),
-      subtitle: 'Working on',
-      icon: 'checkmark.circle.fill',
-      iconColor: theme.colors.accent,
+      title: 'Streak',
+      value: '15',
+      subtitle: 'Days active',
+      icon: 'flame.fill',
+      iconColor: theme.colors.error,
     },
   ];
 
@@ -169,6 +170,7 @@ export default function DashboardScreen() {
                 subtitle={stat.subtitle}
                 icon={stat.icon}
                 iconColor={stat.iconColor}
+                trend={stat.trend}
               />
             </Animated.View>
           ))}

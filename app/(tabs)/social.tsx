@@ -221,7 +221,7 @@ export default function SocialScreen() {
           style={styles.tabContainer}
           entering={FadeInDown.delay(200).springify()}
         >
-          {renderTabButton('feed', 'Activity Feed', 'list.bullet')}
+          {renderTabButton('feed', 'Activity', 'list.bullet')}
           {renderTabButton('developers', 'Developers', 'person.2')}
           {renderTabButton('trending', 'Trending', 'chart.line.uptrend.xyaxis')}
         </Animated.View>
