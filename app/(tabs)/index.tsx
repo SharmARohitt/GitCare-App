@@ -1,98 +1,274 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { ContributionCard } from '@/components/ui/contribution-card';
+import { GradientCard } from '@/components/ui/gradient-card';
+import { StatsCard } from '@/components/ui/stats-card';
+import { Responsive, Typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useBlockchain } from '@/hooks/useBlockchain';
+import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const { width: screenWidth } = Dimensions.get('window');
+const responsiveSpacing = Responsive.getSpacing(screenWidth);
+const responsiveFonts = Responsive.getFontSizes(screenWidth);
 
-export default function HomeScreen() {
+export default function DashboardScreen() {
+  const { theme } = useTheme();
+  const { 
+    isConnected, 
+    balance, 
+    reputationScore, 
+    userBounties, 
+    assignedBounties,
+    refreshData 
+  } = useBlockchain();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  }, [refreshData]);
+
+  // Stats data with blockchain integration
+  const stats = [
+    {
+      title: 'Wallet Balance',
+      value: isConnected ? `${parseFloat(balance).toFixed(3)} ETH` : 'Not Connected',
+      subtitle: 'Available funds',
+      icon: 'wallet.pass.fill',
+      iconColor: theme.colors.success,
+    },
+    {
+      title: 'Reputation',
+      value: isConnected ? reputationScore.toString() : '0',
+      subtitle: 'Developer score',
+      icon: 'star.fill',
+      iconColor: theme.colors.warning,
+    },
+    {
+      title: 'Created Bounties',
+      value: userBounties.length.toString(),
+      subtitle: 'Total issued',
+      icon: 'plus.circle.fill',
+      iconColor: theme.colors.tint,
+    },
+    {
+      title: 'Assigned Bounties',
+      value: assignedBounties.length.toString(),
+      subtitle: 'Working on',
+      icon: 'checkmark.circle.fill',
+      iconColor: theme.colors.accent,
+    },
+  ];
+
+  const recentContributions = [
+    {
+      title: 'Fix memory leak in image processing',
+      repository: 'facebook/react-native',
+      type: 'pull_request' as const,
+      status: 'merged' as const,
+      date: '2 hours ago',
+      additions: 45,
+      deletions: 12,
+    },
+    {
+      title: 'Add dark mode support for navigation',
+      repository: 'expo/expo',
+      type: 'pull_request' as const,
+      status: 'open' as const,
+      date: '1 day ago',
+      additions: 128,
+      deletions: 34,
+    },
+    {
+      title: 'Performance optimization for large lists',
+      repository: 'microsoft/vscode',
+      type: 'issue' as const,
+      status: 'open' as const,
+      date: '3 days ago',
+    },
+  ];
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar style={theme.dark ? 'light' : 'dark'} />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* Gradient Background */}
+      <LinearGradient
+        colors={theme.colors.gradient.secondary}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[styles.scrollContent, { padding: responsiveSpacing.md }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.tint}
+            colors={[theme.colors.tint]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View
+          style={styles.header}
+          entering={FadeInDown.delay(100).springify()}
+        >
+          <View style={styles.headerTop}>
+            <View>
+              
+              <Text style={[styles.title, {
+                color: theme.colors.text,
+                fontSize: responsiveFonts.largeTitle,
+              }]}>
+                Hello, Om! 👋
+              </Text>
+            </View>
+            <View style={styles.headerActions}>
+              {/* Future: Add notification bell or other actions */}
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Hero Stats Card */}
+        <Animated.View entering={FadeInUp.delay(200).springify()}>
+          <GradientCard
+            gradientType="primary"
+            style={{ ...styles.heroCard, marginBottom: responsiveSpacing.lg }}
+            delay={0}
+          >
+            <Text style={[styles.heroTitle, { fontSize: responsiveFonts.title2 }]}>
+              Weekly Summary
+            </Text>
+            <Text style={[styles.heroValue, { fontSize: responsiveFonts.largeTitle }]}>
+              47 Contributions
+            </Text>
+            <Text style={styles.heroSubtitle}>
+              +12% from last week
+            </Text>
+          </GradientCard>
+        </Animated.View>
+
+        <View style={[styles.statsGrid, { gap: responsiveSpacing.md }]}>
+          {stats.map((stat, index) => (
+            <Animated.View
+              key={index}
+              entering={FadeInUp.delay(300 + index * 100).springify()}
+            >
+              <StatsCard
+                title={stat.title}
+                value={stat.value}
+                subtitle={stat.subtitle}
+                icon={stat.icon}
+                iconColor={stat.iconColor}
+              />
+            </Animated.View>
+          ))}
+        </View>
+
+        <Animated.View
+          style={[styles.section, { marginBottom: responsiveSpacing.xl }]}
+          entering={FadeInUp.delay(700).springify()}
+        >
+          <Text style={[styles.sectionTitle, {
+            color: theme.colors.text,
+            fontSize: responsiveFonts.title2,
+            marginBottom: responsiveSpacing.md,
+          }]}>
+            Recent Contributions
+          </Text>
+
+          <View style={[styles.contributionsContainer, { gap: responsiveSpacing.md }]}>
+            {recentContributions.map((contribution, index) => (
+              <Animated.View
+                key={index}
+                entering={FadeInUp.delay(800 + index * 100).springify()}
+              >
+                <ContributionCard
+                  title={contribution.title}
+                  repository={contribution.repository}
+                  type={contribution.type}
+                  status={contribution.status}
+                  date={contribution.date}
+                  additions={contribution.additions}
+                  deletions={contribution.deletions}
+                  onPress={() => console.log('Contribution pressed:', contribution.title)}
+                />
+              </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: responsiveSpacing.xxl,
+  },
+  header: {
+    marginBottom: responsiveSpacing.lg,
+  },
+  headerTop: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerActions: {
+    width: 40, // Maintain layout balance
+  },
+  greeting: {
+    ...Typography.subheadline,
+    marginBottom: responsiveSpacing.xs,
+  },
+  title: {
+    ...Typography.largeTitle,
+    fontWeight: '800',
+  },
+  heroCard: {
     alignItems: 'center',
-    gap: 8,
+    paddingVertical: responsiveSpacing.xl,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  heroTitle: {
+    ...Typography.title2,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginBottom: responsiveSpacing.sm,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  heroValue: {
+    ...Typography.largeTitle,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    marginBottom: responsiveSpacing.xs,
   },
+  heroSubtitle: {
+    ...Typography.subheadline,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: responsiveSpacing.xl,
+  },
+  section: {},
+  sectionTitle: {
+    ...Typography.title2,
+    fontWeight: '700',
+  },
+  contributionsContainer: {},
 });
