@@ -130,7 +130,7 @@ export default function DashboardScreen() {
                 color: theme.colors.text,
                 fontSize: responsiveFonts.largeTitle,
               }]}>
-                Hello, Om! 👋
+                Hello, Rohit! 👋
               </Text>
             </View>
             <View style={styles.headerActions}>
