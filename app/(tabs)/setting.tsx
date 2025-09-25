@@ -1,7 +1,9 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { OpportunityCard } from '@/components/ui/opportunity-card';
+import { WalletConnectionModal } from '@/components/ui/wallet-connection-modal';
 import { BorderRadius, Responsive, Typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useBlockchain } from '@/hooks/useBlockchain';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -17,8 +19,11 @@ type FilterType = 'all' | 'bounty' | 'beginner' | 'intermediate' | 'advanced';
 
 export default function OpportunitiesScreen() {
   const { theme } = useTheme();
+  const { isConnected, selfAssignBounty } = useBlockchain();
   const [activeFilter, setActiveFilter] = React.useState<FilterType>('all');
   const [refreshing, setRefreshing] = React.useState(false);
+  const [showWalletModal, setShowWalletModal] = React.useState(false);
+  const [selectedBounty, setSelectedBounty] = React.useState<typeof opportunities[0] | null>(null);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -91,6 +96,25 @@ export default function OpportunitiesScreen() {
     return opportunity.difficulty === activeFilter;
   });
 
+  const handleClaimBounty = (opportunity: typeof opportunities[0]) => {
+    if (!isConnected) {
+      setSelectedBounty(opportunity);
+      setShowWalletModal(true);
+      return;
+    }
+    
+    // If wallet is connected, proceed with claiming
+    selfAssignBounty(1); // Mock bounty ID
+  };
+
+  const handleWalletConnect = async () => {
+    // After wallet connection, proceed with claiming the bounty
+    if (selectedBounty) {
+      await selfAssignBounty(1); // Mock bounty ID
+      setSelectedBounty(null);
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
@@ -107,18 +131,38 @@ export default function OpportunitiesScreen() {
         style={[styles.header, { padding: responsiveSpacing.md }]}
         entering={FadeInDown.delay(100).springify()}
       >
-        <Text style={[styles.title, { 
-          color: theme.colors.text,
-          fontSize: responsiveFonts.largeTitle,
-        }]}>
-          Opportunities
-        </Text>
-        <Text style={[styles.subtitle, { 
-          color: theme.colors.secondaryText,
-          fontSize: responsiveFonts.subheadline,
-        }]}>
-          {opportunities.length} open bounties and issues
-        </Text>
+        <View style={styles.headerContent}>
+          <View style={styles.titleContainer}>
+            <Text style={[styles.title, { 
+              color: theme.colors.text,
+              fontSize: responsiveFonts.largeTitle,
+            }]}>
+              Opportunities
+            </Text>
+            <Text style={[styles.subtitle, { 
+              color: theme.colors.secondaryText,
+              fontSize: responsiveFonts.subheadline,
+            }]}>
+              {opportunities.length} open bounties and issues
+            </Text>
+          </View>
+          
+          {/* Wallet Status */}
+          <View style={[styles.walletStatus, { 
+            backgroundColor: isConnected ? theme.colors.success + '20' : theme.colors.error + '20' 
+          }]}>
+            <IconSymbol 
+              name={isConnected ? "checkmark.circle.fill" : "xmark.circle.fill"} 
+              size={16} 
+              color={isConnected ? theme.colors.success : theme.colors.error} 
+            />
+            <Text style={[styles.walletStatusText, { 
+              color: isConnected ? theme.colors.success : theme.colors.error 
+            }]}>
+              {isConnected ? 'Connected' : 'Not Connected'}
+            </Text>
+          </View>
+        </View>
       </Animated.View>
 
       <ScrollView
@@ -182,7 +226,7 @@ export default function OpportunitiesScreen() {
                 timeEstimate={opportunity.timeEstimate}
                 applicants={opportunity.applicants}
                 onPress={() => console.log('Opportunity pressed:', opportunity.title)}
-                onClaim={() => console.log('Claim pressed:', opportunity.title)}
+                onClaim={() => handleClaimBounty(opportunity)}
               />
             </Animated.View>
           ))}
@@ -200,6 +244,18 @@ export default function OpportunitiesScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Wallet Connection Modal */}
+      <WalletConnectionModal
+        visible={showWalletModal}
+        onClose={() => {
+          setShowWalletModal(false);
+          setSelectedBounty(null);
+        }}
+        onConnect={handleWalletConnect}
+        bountyTitle={selectedBounty?.title}
+        bountyAmount={selectedBounty?.bounty}
+      />
     </SafeAreaView>
   );
 }
@@ -263,5 +319,25 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     ...Typography.body,
     textAlign: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  walletStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: responsiveSpacing.sm,
+    paddingVertical: responsiveSpacing.xs,
+    borderRadius: BorderRadius.sm,
+    gap: responsiveSpacing.xs,
+  },
+  walletStatusText: {
+    ...Typography.caption1,
+    fontWeight: '600',
   },
 });

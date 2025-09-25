@@ -5,7 +5,8 @@ export { GradientCard } from './gradient-card';
 export { IconSymbol } from './icon-symbol';
 export { LoadingSpinner } from './loading-spinner';
 export { OpportunityCard } from './opportunity-card';
+export { ProjectDetailView } from './project-detail-view';
 export { ProjectItem } from './project-item';
 export { StatsCard } from './stats-card';
 export { ThemeToggle } from './theme-toggle';
-
+export { WalletConnectionModal } from './wallet-connection-modal';

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { Alert } from 'react-native';
 
 export interface BountyData {
   id: number;
@@ -28,19 +29,41 @@ export interface DeveloperProfile {
 }
 
 export function useBlockchain() {
-  const [isConnected] = useState(false);
-  const [isInitializing] = useState(false);
-  const [walletAddress] = useState<string | null>(null);
-  const [balance] = useState('0');
-  const [isLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [balance, setBalance] = useState('0');
+  const [isLoading, setIsLoading] = useState(false);
   const [userBounties] = useState<BountyData[]>([]);
   const [assignedBounties] = useState<BountyData[]>([]);
   const [reputationScore] = useState(0);
   const [developerProfile] = useState<DeveloperProfile | null>(null);
 
+  const connectWallet = useCallback(async (): Promise<boolean> => {
+    setIsInitializing(true);
+    try {
+      // Simulate wallet connection
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay to simulate connection
+      
+      // Mock successful connection
+      setIsConnected(true);
+      setWalletAddress('0x1234567890abcdef1234567890abcdef12345678');
+      setBalance('125.45');
+      
+      Alert.alert('Success', 'Aptos wallet connected successfully!');
+      return true;
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+      Alert.alert('Error', 'Failed to connect to Aptos wallet. Please try again.');
+      return false;
+    } finally {
+      setIsInitializing(false);
+    }
+  }, []);
+
   const initializeWallet = async (): Promise<boolean> => {
     console.log('Mock: Initialize wallet');
-    return false;
+    return connectWallet();
   };
 
   const createWallet = async () => {
@@ -64,8 +87,24 @@ export function useBlockchain() {
   };
 
   const selfAssignBounty = async (bountyId: number): Promise<boolean> => {
-    console.log('Mock: Self assign bounty', { bountyId });
-    return false;
+    if (!isConnected) {
+      Alert.alert('Wallet Required', 'Please connect your Aptos wallet first to claim this bounty.');
+      return false;
+    }
+    
+    setIsLoading(true);
+    try {
+      // Simulate bounty claiming process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      Alert.alert('Success', 'Bounty claimed successfully! You can now start working on it.');
+      return true;
+    } catch (error) {
+      console.error('Failed to claim bounty:', error);
+      Alert.alert('Error', 'Failed to claim bounty. Please try again.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const registerDeveloper = async (skills: string[]): Promise<boolean> => {
@@ -98,7 +137,10 @@ export function useBlockchain() {
   };
 
   const disconnect = async () => {
-    console.log('Mock: Disconnect');
+    setIsConnected(false);
+    setWalletAddress(null);
+    setBalance('0');
+    console.log('Wallet disconnected');
   };
 
   return {
@@ -114,6 +156,7 @@ export function useBlockchain() {
     developerProfile,
     
     // Actions
+    connectWallet,
     initializeWallet,
     createWallet,
     createBounty,
