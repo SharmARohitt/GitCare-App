@@ -1,50 +1,64 @@
-# Welcome to your Expo app 👋
+# 🚀 GitCare – Powered by Aptos  
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+GitCare is a **Web3-powered contributor economy platform** that rewards developers for their open-source contributions.  
+Built with **React Native (Expo)** for cross-platform support and **Avalanche + Aptos blockchain** for transparent, instant rewards and trust scoring.  
 
-## Get started
+---
 
-1. Install dependencies
+## 📖 Project Overview  
 
-   ```bash
-   npm install
-   ```
+🔗 **Problem:**  
+- Open-source contributors often go unrecognized and unrewarded.  
+- Spam PRs, low-quality contributions, and lack of transparency make collaboration hard.  
 
-2. Start the app
+💡 **Solution:**  
+GitCare creates a **decentralized contribution tracker** that:  
+- Tracks every PR and commit on-chain (tamper-proof records).  
+- Rewards top contributors with bounties **instantly via Aptos smart contracts**.  
+- Builds a **developer trust score** based on quality contributions.  
+- Creates a community-driven ecosystem for collaboration, problem-solving, and project growth.  
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🎯 Key Features  
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+✅ **On-Chain Contribution Proof** – Every PR, commit & issue logged on Aptos blockchain  
+✅ **Instant Bounty Payouts** – No waiting, no bias, trustless payments  
+✅ **Developer Trust Score** – Reputation system for credible contributors  
+✅ **Issue-to-Solution Hub** – Post problems with screenshots, get global contributors to help  
+✅ **Community Showcase** – Highlight contributors & projects for recognition  
+✅ **Cross-Platform App (Expo)** – Works on Android, iOS, and Web  
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🛠️ Tech Stack  
 
-When you're ready, run:
+- **Frontend:** React Native (Expo)  
+- **Backend:** Node.js, Express, MongoDB  
+- **Blockchain:** Aptos (Move language, Smart Contracts), Avalanche  
+- **API Integrations:** GitHub API (for PR & commit sync)  
+- **Animations:** GSAP & Lottie (for interactive UI)  
+
+---
+
+## 🌐 Why Aptos?  
+
+GitCare leverages **Aptos’ high-speed, low-cost transactions** to deliver:  
+- Near-instant bounty payouts  
+- Low gas fees for contributors & maintainers  
+- Secure on-chain data storage for reputation scores  
+- Scalability to onboard thousands of contributors  
+
+> **GitCare is proudly powered by Aptos** to ensure **trust, speed, and transparency** in the open-source ecosystem.
+
+---
+
+## 📱 Expo Setup  
+
+Clone the repo and run the app in development mode:  
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+git clone https://github.com/your-username/gitcare.git
+cd gitcare
+npm install
+npx expo start
